@@ -1,0 +1,29 @@
+---
+
+- name: Generate kubeadm cluster token
+  command: kubeadm token generate
+  register: kubeadm_clusterToken_generate
+  when: kubeadm_clusterToken is not defined
+
+- name: Update facts to include 'kubeadm' cluster token
+  set_fact: 
+    kubeadm_clusterToken: "{{ kubeadm_clusterToken_generate.stdout }}"
+  when: kubeadm_clusterToken is not defined
+
+- name: Reset the Kubernetes Cluster on the Master Server
+  command: "kubeadm reset"
+  register: kubeadm_master
+
+- name: Init the Kubernetes Cluster on the Master Server
+  command: "kubeadm init --apiserver-advertise-address={{ hostvars[groups['kubernetes-master'][0]]['ansible_' + kubernetes_interface].ipv4.address }} --token {{ kubeadm_clusterToken }}"
+
+- name: create kubenetes default file
+  template:
+    src: etc/profile.d/kubernetes.sh.j2
+    dest: /etc/profile.d/kubernetes.sh
+    mode: 0755
+
+- name: Install the Kubernetes network cluster on the Master Server
+  shell: "kubectl apply -f \"https://cloud.weave.works/k8s/net?k8s-version=$(kubectl version | base64 | tr -d '\n')\""
+  environment:
+    KUBECONFIG: /etc/kubernetes/admin.conf

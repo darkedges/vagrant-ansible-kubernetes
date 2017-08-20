@@ -1,0 +1,8 @@
+---
+
+# this should only be needed on vagrant boxes
+- name: setup route
+  command: "route add 10.96.0.1 gw {{ hostvars[groups['kubernetes-master'][0]]['ansible_' + kubernetes_interface].ipv4.address }}"
+
+- name: Join the Kubernetes Master Server
+  command: "kubeadm join --token {{ hostvars[groups['kubernetes-master'][0]]['kubeadm_clusterToken'] }} {{ hostvars[groups['kubernetes-master'][0]]['ansible_' + kubernetes_interface].ipv4.address }}:6443"

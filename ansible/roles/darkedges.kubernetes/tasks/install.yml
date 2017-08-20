@@ -1,0 +1,62 @@
+---
+
+- name: disable SELinux
+  selinux:
+    state: disabled
+
+- name: Add Kubernetes repo
+  yum_repository:
+    name: Kubernetes
+    description: Kubernetes YUM repo
+    enabled: yes
+    baseurl: http://yum.kubernetes.io/repos/kubernetes-el7-x86_64
+    gpgcheck: no
+
+- name: Install Kubernetes packages
+  package:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - docker 
+    - kubelet 
+    - kubeadm 
+    - kubectl 
+    - kubernetes-cni
+    - net-tools
+
+- name: enable the 'br_netfilter' module
+  modprobe:
+    name: br_netfilter
+    state: present
+
+- name: update kernel 'net.bridge.bridge-nf-call-iptables' settings
+  sysctl:
+    name: net.bridge.bridge-nf-call-iptables
+    value: 1
+    sysctl_set: yes
+    state: present
+    reload: yes
+
+- name: Remove existing kubelet args from drop-in unit
+  lineinfile:
+    dest: /etc/systemd/system/kubelet.service.d/10-kubeadm.conf
+    regexp: '^Environment="KUBELET_EXTRA_ARGS'
+    state: absent
+
+- name: Use systemd kubelet cgroup driver
+  lineinfile:
+    dest: /etc/systemd/system/kubelet.service.d/10-kubeadm.conf
+    insertafter: '^Environment=\"KUBELET_AUTHZ_ARGS'
+    line: 'Environment="KUBELET_EXTRA_ARGS=--cgroup-driver=systemd"'
+  notify:
+  - restartKubelet
+
+- name: enable Kubernetes services
+  systemd:
+    name: "{{ item }}"    
+    state: started
+    enabled: yes
+    daemon_reload: yes
+  with_items:
+    - docker
+    - kubelet
