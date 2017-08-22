@@ -1,0 +1,17 @@
+kubernetes-01 ansible_ssh_host=kubernetes-01 ansible_ssh_port=22 ansible_ssh_user='vagrant'
+kubernetes-02 ansible_ssh_host=kubernetes-02 ansible_ssh_port=22 ansible_ssh_user='vagrant'
+kubernetes-03 ansible_ssh_host=kubernetes-03 ansible_ssh_port=22 ansible_ssh_user='vagrant'
+
+[kubernetes-master]
+kubernetes-01
+
+[kubernetes-nodes]
+kubernetes-02
+kubernetes-03
+
+[kubernetes:children]
+kubernetes-master
+kubernetes-nodes
+
+[all:children]
+kubernetes

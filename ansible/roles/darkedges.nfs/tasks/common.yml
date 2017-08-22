@@ -1,0 +1,16 @@
+---
+
+- name: Install NFS packages
+  package:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - nfs-utils 
+    - libnfsidmap
+
+- name: create nfs share directories
+  file:
+    path: "{{ item.path }}"
+    state: directory
+    mode: 0777
+  with_items: "{{ nfs_exports }}"

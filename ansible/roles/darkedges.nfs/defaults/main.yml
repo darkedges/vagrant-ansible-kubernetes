@@ -1,0 +1,6 @@
+---
+
+nfs_server_group: server
+nfs_client_group: client
+nfs_exports:
+nfs_interface: eth0

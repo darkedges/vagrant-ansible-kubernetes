@@ -1,0 +1,9 @@
+---
+
+- include: common.yml
+
+- include: server.yml
+  when: ( inventory_hostname in groups[nfs_server_group] )
+
+- include: client.yml
+  when: ( inventory_hostname in groups[nfs_client_group] )

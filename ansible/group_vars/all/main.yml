@@ -2,3 +2,11 @@
 
 ansible_ssh_private_key_file: "{{ lookup('env', 'PWD') }}/.vagrant/machines/{{ inventory_hostname }}/virtualbox/private_key"
 kubernetes_interface: "eth1"
+nfs_interface: "{{ kubernetes_interface }}"
+
+nfs_server_group: kubernetes-master
+nfs_client_group: kubernetes-nodes
+
+nfs_exports:
+  - path: "/nfsfileshare"
+    export: "*(fsid=0,rw,async,no_root_squash,no_subtree_check,insecure)"

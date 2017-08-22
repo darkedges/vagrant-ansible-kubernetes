@@ -1,0 +1,19 @@
+---
+
+- debug: msg="Client"
+
+- name: enable services
+  service: 
+    name: "{{ item }}"
+    state: started
+    enabled: yes
+  with_items:
+    - rpcbind
+
+- name: mount the NFS directories
+  mount:
+    name: "{{ item.path }}"
+    src: "{{hostvars[groups[nfs_server_group][0]]['ansible_' + nfs_interface].ipv4.address }}:{{ item.path }}"
+    state: mounted
+    fstype: nfs
+  with_items: "{{ nfs_exports }}"

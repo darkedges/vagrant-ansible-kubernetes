@@ -1,3 +1,5 @@
 ---
 
 kubernetes_interface: "{{ ansible_default_ipv4.interface }}"
+
+install_nfs: true

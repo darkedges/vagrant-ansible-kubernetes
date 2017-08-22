@@ -1,6 +1,6 @@
 ---
 
- - include: install.yml
+- include: install.yml
 
 - include: master.yml
   when: ( inventory_hostname in groups['kubernetes-master'] )
