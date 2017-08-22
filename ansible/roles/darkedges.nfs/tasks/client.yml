@@ -13,7 +13,7 @@
 - name: mount the NFS directories
   mount:
     name: "{{ item.path }}"
-    src: "{{hostvars[groups[nfs_server_group][0]]['ansible_' + nfs_interface].ipv4.address }}:{{ item.path }}"
+    src: "{{ hostvars[groups[nfs_server_group][0]]['ansible_' + nfs_interface].ipv4.address }}:{{ item.remote }}"
     state: mounted
     fstype: nfs
   with_items: "{{ nfs_exports }}"
